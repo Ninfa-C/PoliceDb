@@ -1,0 +1,64 @@
+﻿@model VerbaliListModel
+
+@{
+    var cat = ViewBag.Category as string;
+    ViewData["Title"] = ViewBag.Title;
+}
+
+
+<h1>@ViewBag.Title</h1>
+
+@if (Model?.VerbaliList != null && Model.VerbaliList.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @if (cat == "Oltre10Punti" || cat == "Oltre400Euro")
+                {
+                    <th>Data Verbale</th>
+                }
+                <th>Nome</th>
+				<th>Cognome</th>
+				<th>CF</th> 
+                @if (cat == "TotaleVerbali")
+                {
+                    <th>Totale Verbali</th>
+                }
+                @if (cat == "TotalePunti" ||cat == "Oltre10Punti")
+                {
+                    <th>Punti Decurtati</th>
+                }
+                @if (cat == "Oltre400Euro")
+                {
+                    <th>Importo</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.VerbaliList)
+            {
+                <tr>
+                    @if (cat == "Oltre10Punti" || cat == "Oltre400Euro")
+                    {
+                        <td>@item.DataViolazione</td>
+                    }
+                    <td>@item.Anagrafica.Nome</td>
+                    <td>@item.Anagrafica.Cognome</td>                    
+                    <td>@item.Anagrafica.CF</td>
+                    @if (cat == "Oltre400Euro")
+                    {
+                        <td>€ @item.Total2</td>
+                    } else {
+                        <td>@item.Total</td>
+                    }
+                    
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nessun dato disponibile.</p>
+}

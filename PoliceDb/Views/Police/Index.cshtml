@@ -1,0 +1,82 @@
+﻿@model VerbaliListModel
+
+@{
+	ViewData["Title"] = "IPD- Report Record";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<h1 class="mb-4">Polizia - Registro dei verbali </h1>
+
+@if (Model.VerbaliList != null && Model.VerbaliList.Count > 0)
+{
+    <table class="table table-striped table-bordered table-hover table-striped ">
+        <thead class="thead-dark">
+            <tr>
+                <th>Data</th>
+                <th>Ora</th>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Cod. Fiscale</th>
+                <th>Città</th>
+                <th>N° Violazioni</th>
+                <th>Totale Importo</th>
+                <th>Modifica</th>
+                <th>Cancella</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.VerbaliList)
+            {
+                <tr class="text-center">
+                    <td>@p.DataViolazione.ToShortDateString()</td>
+                    <td>@p.DataViolazione.ToShortTimeString()</td>
+                    <td>@p.Anagrafica!.Nome</td>
+                    <td>@p.Anagrafica.Cognome</td>
+                    <td>@p.Anagrafica.CF</td>
+                    <td>@p.Anagrafica.Città</td>
+                    <td>@p.ViolazioniVerbali.Count</td>
+                    <td>€ @p.TotaleImporto</td>
+
+                    <td>
+
+                        @if (p.ScadenzaContestazione < DateTime.Now)
+                        {
+                            <button type="button" disabled class="btn border-0" title="Delete disabled">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <a class="nav-link" asp-controller="Police" asp-action="EditReport" asp-route-id="@p.IdVerbale"><i class="bi bi-pencil-square"></i></a>
+                        }
+
+                        
+                    </td>
+                    <td>
+                        @if (p.ScadenzaContestazione < DateTime.Now)
+                        {
+                            <button type="button" disabled class="btn border-0" title="Delete disabled">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <a class="nav-link" asp-controller="Police" asp-action="Delete" asp-route-id="@p.IdVerbale" title="Delete">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        }
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+

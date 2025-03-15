@@ -1,0 +1,183 @@
+﻿@model PoliceAddModel
+@{
+	var violazioniList = ViewBag.Violazioni as List<TipoViolazione>;
+	ViewData["Title"] = "Aggiungi Registro";
+}
+
+<h1 class="mb-5">Registra un nuovo verbale</h1>
+
+@if (TempData["Error"] != null)
+{
+	<span class="text-danger">@TempData["Error"]</span>
+}
+
+
+<div class="container-fluid mb-3">
+	<form method="post" asp-controller="Police" asp-action="AddSave" class="mb-5">
+
+		<fieldset class="row g-3 border-1 mb-4">
+			<legend>Anagrafica</legend>
+			<div class="form-group col-md-4">
+				<label asp-for="Anagrafica.Nome" class="control-label"></label>
+				<input asp-for="Anagrafica.Nome" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.Nome" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-4">
+				<label asp-for="Anagrafica.Cognome" class="control-label"></label>
+				<input asp-for="Anagrafica.Cognome" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.Cognome" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-4">
+				<label asp-for="Anagrafica.CF" class="control-label">Codice Fiscale</label>
+				<input asp-for="Anagrafica.CF" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.CF" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-6">
+				<label asp-for="Anagrafica.Indirizzo" class="control-label"></label>
+				<input asp-for="Anagrafica.Indirizzo" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.Indirizzo" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-3">
+				<label asp-for="Anagrafica.Città" class="control-label">Città</label>
+				<input asp-for="Anagrafica.Città" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.Città" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-3">
+				<label asp-for="Anagrafica.CAP" class="control-label"></label>
+				<input asp-for="Anagrafica.CAP" class="form-control" type="text" />
+				<span asp-validation-for="Anagrafica.CAP" class="text-danger"></span>
+			</div>
+		</fieldset>
+
+		<fieldset class="row g-3 border-1 mb-4">
+			<legend>Dati Verbale</legend>
+			<div class="form-group col-md-4">
+				<label asp-for="DataViolazione" class="control-label"> Data Violazione</label>
+				<input asp-for="DataViolazione" class="form-control" type="datetime-local" />
+				<span asp-validation-for="DataViolazione" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-4">
+				<label asp-for="NominativoAgente" class="control-label">Nome Agente</label>
+				<input asp-for="NominativoAgente" class="form-control" type="text" />
+				<span asp-validation-for="NominativoAgente" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-4">
+				<label asp-for="DataTrascrizioneVerbale" class="control-label">Data Trascrizione Verbale</label>
+				<input asp-for="DataTrascrizioneVerbale" class="form-control" type="datetime-local" />
+				<span asp-validation-for="DataTrascrizioneVerbale" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-3">
+				<label asp-for="IndirizzoViolazione" class="control-label">Indirizzo Violazione</label>
+				<input asp-for="IndirizzoViolazione" class="form-control" type="text" />
+				<span asp-validation-for="IndirizzoViolazione" class="text-danger"></span>
+			</div>
+
+			<fieldset class="row g-3 border p-3 mb-4">
+				<legend class="col-form-label fs-5 fw-bold">Violazioni</legend>
+				<div class="form-group col-md-6">
+					<label class="form-label">Seleziona Violazioni</label>
+					<select id="violazioniSelect" class="form-control" multiple>
+						@if (violazioniList != null)
+						{
+							@foreach (var item in violazioniList)
+							{
+								<option value="@item.Id">@item.Descrizione</option>
+							}
+						}
+					</select>
+				</div>
+				<div class="form-group col-md-12" id="violazioniContainer">
+				</div>
+			</fieldset>
+
+			<div class="form-group col-md-3">
+				<label asp-for="Importo" class="control-label"></label>
+				<input asp-for="Importo" id="totaleImporto" class="form-control" type="number" step="0.01" readonly />
+				<span asp-validation-for="Importo" class="text-danger"></span>
+			</div>
+			<div class="form-group col-md-3">
+				<label asp-for="DecurtamentoPunti" class="control-label"></label>
+				<input asp-for="DecurtamentoPunti" id="totaleDecurtamentoPunti" class="form-control" type="number" readonly />
+				<span asp-validation-for="DecurtamentoPunti" class="text-danger"></span>
+			</div>
+
+		</fieldset>
+
+
+		<div class="form-group">
+			<input type="submit" value="Crea" class="btn btn-primary" />
+		</div>
+	</form>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+	document.getElementById("violazioniSelect").addEventListener("change", function () {
+		var selectedOptions = Array.from(this.selectedOptions);
+		var container = document.getElementById("violazioniContainer");
+		container.innerHTML = ""; // Pulisce il contenuto precedente
+
+		selectedOptions.forEach((option, index) => {  // 👈 Indice numerico per ogni violazione
+			var violazioneId = option.value;
+			var violazioneDesc = option.text;
+
+			var row = document.createElement("div");
+			row.classList.add("row", "mb-2");
+
+			row.innerHTML = `
+				<div class="col-md-4">
+					<label class="form-label">Violazione: ${violazioneDesc}</label>
+					<input type="hidden" name="Violazioni[${index}].IdViolazione" value="${violazioneId}" />
+				</div>
+				<div class="col-md-4">
+					<label class="form-label">Importo</label>
+					<input type="number" step="0.01" class="form-control importo-violazione"
+						   name="Violazioni[${index}].Importo" required />
+				</div>
+				<div class="col-md-4">
+					<label class="form-label">Decurtamento Punti</label>
+					<input type="number" class="form-control punti-violazione"
+						   name="Violazioni[${index}].DecurtamentoPunti" required />
+				</div>
+			`;
+			container.appendChild(row);
+		});
+
+		calcolaTotali(); // Aggiorna i totali all'aggiornamento
+	});
+
+	document.addEventListener('input', function (event) {
+		if (event.target.classList.contains('importo-violazione') || event.target.classList.contains('punti-violazione')) {
+			calcolaTotali();
+		}
+	});
+
+	function calcolaTotali() {
+		let totaleImporto = 0;
+		let totalePunti = 0;
+		document.querySelectorAll('.importo-violazione').forEach(input => {
+			const valore = parseFloat(input.value);
+			if (!isNaN(valore)) {
+				totaleImporto += valore;
+			}
+		});
+		document.querySelectorAll('.punti-violazione').forEach(input => {
+			const valore = parseInt(input.value);
+			if (!isNaN(valore)) {
+				totalePunti += valore;
+			}
+		});
+
+		// Assicurati che gli elementi esistano prima di modificarne il valore
+		let inputImporto = document.getElementById('totaleImporto');
+		let inputPunti = document.getElementById('totaleDecurtamentoPunti');
+
+		if (inputImporto) {
+			inputImporto.value = totaleImporto.toFixed(2);
+		}
+		if (inputPunti) {
+			inputPunti.value = totalePunti;
+		}
+	}
+</script>
