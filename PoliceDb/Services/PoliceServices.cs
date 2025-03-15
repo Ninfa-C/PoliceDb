@@ -157,18 +157,13 @@ namespace PoliceDb.Services
 
             if (report == null)
             {
-                // Log: Report non trovato
                 Console.WriteLine($"Report con IdVerbale {model.IdVerbale} non trovato.");
                 return false;
             }
-
-            // Ricarica le violazioni esistenti
             foreach (var violazioneEsistente in report.ViolazioniVerbali)
             {
                 await _db.Entry(violazioneEsistente).ReloadAsync();
             }
-
-            // Aggiorna i dati del report
             report.DataViolazione = model.DataViolazione;
             report.DataTrascrizioneVerbale = model.DataTrascrizioneVerbale;
             report.NominativoAgente = model.NominativoAgente;
@@ -177,11 +172,9 @@ namespace PoliceDb.Services
             report.TotaleDecurtamentoPunti = model.DecurtamentoPunti;
             report.ScadenzaContestazione = model.DataViolazione.AddDays(60);
 
-            // Trova o crea l'anagrafica
             var person = await FindOrCreate(model.Anagrafica);
             report.IdAnagrafica = person.IdAnagrafica;
 
-            // Aggiorna le violazioni esistenti e aggiungi nuove violazioni
             foreach (var violazioneModel in model.Violazioni)
             {
                 var violazioneEsistente = report.ViolazioniVerbali
@@ -189,16 +182,13 @@ namespace PoliceDb.Services
                 decimal importo = decimal.Parse(violazioneModel.Importo.ToString(), CultureInfo.InvariantCulture);
                 if (violazioneEsistente != null)
                 {
-                    // Aggiorna la violazione esistente
                     violazioneEsistente.Importo = importo;
                     violazioneEsistente.DecurtamentoPunti = violazioneModel.DecurtamentoPunti;
 
-                    // Imposta lo stato dell'entità su Modified
                     _db.Entry(violazioneEsistente).State = EntityState.Modified;
                 }
                 else
                 {
-                    // Aggiungi una nuova violazione
                     var nuovaViolazione = new ViolazioniVerbali
                     {
                         Id = Guid.NewGuid(),
@@ -212,8 +202,6 @@ namespace PoliceDb.Services
                     _db.Entry(nuovaViolazione).State = EntityState.Added;
                 }
             }
-
-            // Salva le modifiche nel database
             try
             {
                 await _db.SaveChangesAsync();
@@ -221,13 +209,12 @@ namespace PoliceDb.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                // Log: Errore di concorrenza
+               
                 Console.WriteLine($"Errore di concorrenza: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
-            {
-                // Log: Altri errori
+            {               
                 Console.WriteLine($"Errore durante il salvataggio: {ex.Message}");
                 return false;
             }

@@ -98,7 +98,7 @@
 									<label class="form-label">Importo</label>
 									<input type="text" class="form-control importo-violazione"
 										   name="Violazioni[@i].Importo" @(isChecked ? "" : "disabled") required
-										   value="@(isChecked ? selected?.Importo: "")" />
+										   value="@(isChecked ? selected?.Importo.ToString("N2") : "")" />
 								</div>
 								<div class="col-md-4">
 									<label class="form-label">Decurtamento Punti</label>
@@ -200,18 +200,11 @@
 		});
 
 
-				document.querySelector('form').addEventListener('submit', function(event) {
-
-			// Se il valore contiene un punto, sostituiscilo con la virgola prima di inviare
-			
-
-				document.querySelectorAll('.importo-violazione').forEach(input => {
-					var valoreImporto = importoInput.value;
-if (valoreImporto.includes('.')) {
-				importoInput.value = valoreImporto.replace('.', ',');
-			}
-				});
-			// Ora il valore del campo è in formato con virgola (ad esempio 250,50)
+		document.querySelector("form").addEventListener("submit", function (event) {
+			var importoInputs = document.querySelectorAll(".importo-violazione");
+			importoInputs.forEach(function (input) {
+				input.value = input.value.replace(",", ".");
+			});
 		});
 			
 	</script>
